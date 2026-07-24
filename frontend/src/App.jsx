@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 
@@ -20,6 +21,9 @@ function App() {
 
   return (
     <div>
+      {/* Top Right Toast Notifications */}
+      <Toaster position="top-right" reverseOrder={false} />
+
       {isAuthenticated ? (
         <Dashboard onLogout={handleLogout} />
       ) : (

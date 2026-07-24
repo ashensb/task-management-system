@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import API from '../services/api';
-import { Lock, Mail, CheckSquare } from 'lucide-react';
+import { Lock, Mail, CheckSquare, Loader2 } from 'lucide-react';
 
 const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('admin@test.com');
   const [password, setPassword] = useState('123456');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       const response = await API.post('/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      toast.success('Successfully logged in!');
       onLoginSuccess();
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check credentials.');
+      toast.error(err.response?.data?.message || 'Login failed. Invalid credentials.');
     } finally {
       setLoading(false);
     }
@@ -33,14 +34,8 @@ const Login = ({ onLoginSuccess }) => {
             <CheckSquare className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-bold text-slate-900">Welcome Back</h2>
-          <p className="text-slate-5-00 text-sm mt-1">Task Management Portal</p>
+          <p className="text-slate-500 text-sm mt-1">Task Management Portal</p>
         </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -74,9 +69,16 @@ const Login = ({ onLoginSuccess }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition duration-200 shadow-lg shadow-indigo-200 disabled:opacity-50 mt-2"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition duration-200 shadow-lg shadow-indigo-200 disabled:opacity-50 mt-2 flex items-center justify-center space-x-2"
           >
-            {loading ? 'Authenticating...' : 'Sign In'}
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Signing In...</span>
+              </>
+            ) : (
+              <span>Sign In</span>
+            )}
           </button>
         </form>
       </div>
